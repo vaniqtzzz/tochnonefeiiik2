@@ -2,14 +2,14 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>HACKER TERMINAL</title>
+<title>HARDCORE HACKER TERMINAL</title>
 
 <style>
 body {
     margin: 0;
     background: black;
     color: lime;
-    font-family: Consolas, monospace;
+    font-family: 'Consolas', monospace;
     overflow: hidden;
 }
 
@@ -22,24 +22,30 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 35px;
+    font-size: 40px;
     cursor: pointer;
     z-index: 10;
+    text-shadow: 0 0 10px red;
 }
 
 #terminal {
     padding: 20px;
     white-space: pre-line;
     font-size: 18px;
+    text-shadow: 0 0 5px lime;
+    height: 100vh;
+    overflow-y: auto;
 }
 
-#bgImage {
+#bgChaos {
     position: fixed;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    opacity: 0.15;
+    font-family: monospace;
+    color: rgba(0,255,0,0.05);
+    font-size: 14px;
     z-index: -1;
+    pointer-events: none;
 }
 
 input {
@@ -49,6 +55,7 @@ input {
     color: lime;
     font-size: 18px;
     outline: none;
+    animation: blink 1s infinite;
 }
 
 .blink {
@@ -58,48 +65,68 @@ input {
 @keyframes blink {
     50% { opacity: 0; }
 }
+
+.scary {
+    color: red;
+    text-shadow: 0 0 10px red;
+}
 </style>
 </head>
 
 <body>
 
-<div id="startScreen">⚠ CLICK TO ENTER SYSTEM ⚠</div>
+<div id="startScreen">⚠ ENTER THE HACKER DOMAIN ⚠</div>
 
-<img id="bgImage" src="image.png">
-
+<div id="bgChaos"></div>
 <div id="terminal"></div>
 
 <audio id="sound" src="sound.mp3" loop></audio>
 
 <script>
 const PASSWORD = "1337";
-
 const terminal = document.getElementById("terminal");
-const sound = document.getElementById("sound");
 const startScreen = document.getElementById("startScreen");
+const sound = document.getElementById("sound");
+const bgChaos = document.getElementById("bgChaos");
 
+// Початкові “кінематографічні” рядки
 const lines = [
-"> Booting system...",
-"> Establishing secure connection...",
-"> Accessing classified database...",
-"> ERROR: Unauthorized access detected!",
-"> Activating hacker protocol...",
+"> Booting hardcore system...",
+"> Establishing ultra-secure connection...",
+"> Accessing classified hacker database...",
+"> ALERT: Unauthorized intrusion detected!",
+"> Activating DARK PROTOCOL...",
 "",
 "> Enter password to restore system:"
 ];
 
 let i = 0;
 
+// Функція хаотичного фону
+function chaosBackground() {
+    let chars = "!@#$%^&*()_+{}[];:<>?/|\\ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let output = "";
+    for (let j=0;j<500;j++){
+        output += chars[Math.floor(Math.random()*chars.length)];
+        if (Math.random()<0.02) output += "\n";
+    }
+    bgChaos.textContent = output;
+    requestAnimationFrame(chaosBackground);
+}
+
+// Друк рядків терміналу
 function typeLine() {
     if (i < lines.length) {
         terminal.innerHTML += lines[i] + "\n";
         i++;
-        setTimeout(typeLine, 700);
+        setTimeout(typeLine, 600 + Math.random()*200);
+        terminal.scrollTop = terminal.scrollHeight;
     } else {
         createInput();
     }
 }
 
+// Створення поля для пароля
 function createInput() {
     const input = document.createElement("input");
     input.type = "password";
@@ -110,23 +137,33 @@ function createInput() {
         if (e.key === "Enter") {
             if (input.value === PASSWORD) {
                 sound.pause();
-                document.exitFullscreen();
-                document.body.innerHTML = "<h1 style='color:lime;text-align:center;margin-top:20%;'>SYSTEM RESTORED 😎</h1>";
+                terminal.innerHTML += "\n> ✅ SYSTEM RESTORED. ACCESS GRANTED 😎\n";
+                input.remove();
             } else {
-                terminal.innerHTML += "\n> ACCESS DENIED\n";
+                let randError = [
+                    "ACCESS DENIED! ⚠",
+                    "SYSTEM BREACH DETECTED! 🔥",
+                    "INTRUSION ALERT! 💀",
+                    "SECURITY OVERRIDE FAILED! ⚡"
+                ];
+                terminal.innerHTML += "\n> " + randError[Math.floor(Math.random()*randError.length)] + "\n";
                 input.value = "";
+                terminal.scrollTop = terminal.scrollHeight;
             }
         }
     });
 }
 
+// Початок програми
 startScreen.addEventListener("click", () => {
     document.documentElement.requestFullscreen();
     startScreen.style.display = "none";
     sound.play();
+    chaosBackground();
     typeLine();
 });
 
+// Escape для виходу
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
         sound.pause();
